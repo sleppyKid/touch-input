@@ -1,5 +1,3 @@
-from time import sleep
-
 from .touch_pointer import *
 
 
@@ -26,14 +24,14 @@ class TouchManager:
             visuals = 1 if self.__visuals_enable else 3
             inited = windll.user32.InitializeTouchInjection(self.__touch_nums, visuals)
             if inited != 0:
-                print("Initialized Touch Injection")
+                #print("Initialized Touch Injection")
                 self.touch_inited = True
 
     def __init_touch_settings(self):
         for ind in range(self.__touch_nums):
             pointer = TouchPointer(ind, self)
             self.__pointers.append(pointer)
-        self.update(ignore_errors=True)
+        self._update_all_pointers(ignore_errors=True)
 
     def __set_pointers_to_update(self):
         for _, x in self.get_pressed_pointers():
@@ -68,7 +66,7 @@ class TouchManager:
     def get_upped_pointers(self):
         return [(x.id, x) for x in self.__pointers if x.status == PointerStatus.UP]
 
-    def update(self, ignore_errors=False):
+    def _update_all_pointers(self, ignore_errors=False):
         """Updating all touch pointers on screen"""
 
         filtered = self.__get_filtered_list()
@@ -82,7 +80,8 @@ class TouchManager:
 
             self.__set_pointers_to_update()
 
-    def manual_update(self):
+    def update(self, ignore_errors=False):
         """Calling update, if auto update is off"""
         if not self.auto_update:
-            self.update()
+            self._update_all_pointers(ignore_errors)
+

@@ -27,7 +27,7 @@ class TouchPointer:
 
     def auto_update(self):
         if self.interface.auto_update:
-            self.interface.update()
+            self.interface._update_all_pointers()
 
     @staticmethod
     def set_pointer_settings(id, tifno):
@@ -116,10 +116,10 @@ class TouchPointer:
             point = self._lerp2D(start, finish, t)
             x, y = int(point[0]), int(point[1])
             self.swipe((x, y))
-            self.interface.manual_update()
+            self.interface._update_all_pointers()
             sleep(wait)
         self.pull_up()
-        self.interface.manual_update()
+        self.interface._update_all_pointers()
 
     def action_press(self, point: (int, int), hold_time: float = 0.5):
         """
@@ -128,7 +128,7 @@ class TouchPointer:
         """
         hold_time = min(hold_time, 0.5)
         self.press_down(point)
-        self.interface.manual_update()
+        self.interface._update_all_pointers()
         sleep(hold_time)
         self.pull_up()
-        self.interface.manual_update()
+        self.interface._update_all_pointers()
