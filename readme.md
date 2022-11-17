@@ -8,6 +8,10 @@ Simple touch input library with multitouch support
 from time import sleep
 from touch_input import TouchManager
 
+
+# Open this link in browser. This is good for multitouch testing  
+# https://naqtn.github.io/WBBMTT/touch-tester.html?markSizeScale=1.0&backGroundColor=black
+
 # Create TouchManager object
 tm = TouchManager(touch_nums=2, visuals_enable=True, auto_update=True)
 
