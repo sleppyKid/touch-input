@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='touch_input',
-      version='1.0',
+      version='1.0.1',
       description='Python Touch Input',
       author='',
       author_email='',

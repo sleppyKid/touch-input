@@ -21,12 +21,15 @@ class TouchPointer:
 
     def get_status(self):
         """Get status of current pointer"""
-        x = self.touch_info.pointerInfo.ptPixelLocation.x
-        y = self.touch_info.pointerInfo.ptPixelLocation.y
+        x, y = self.get_position()
         return self.id, self.status, x, y
 
-    def auto_update(self):
-        if self.interface.auto_update:
+    def get_position(self):
+        return (self.touch_info.pointerInfo.ptPixelLocation.x,
+                self.touch_info.pointerInfo.ptPixelLocation.y)
+
+    def _auto_update(self):
+        if self.interface._auto_update:
             self.interface._update_all_pointers()
 
     @staticmethod
@@ -71,7 +74,7 @@ class TouchPointer:
 
         self.status = PointerStatus.PRESSED
         self.need_update = True
-        self.auto_update()
+        self._auto_update()
 
     def swipe(self, pos: (int, int), finger_radius=5):
         if self.status in [self.status.PRESSED, self.status.SWIPE]:
@@ -86,7 +89,7 @@ class TouchPointer:
         self._set_position((x, y), finger_radius)
         self.status = PointerStatus.SWIPE
         self.need_update = True
-        self.auto_update()
+        self._auto_update()
 
     def pull_up(self):
         if self.status == self.status.UP:
@@ -96,7 +99,7 @@ class TouchPointer:
         self.touch_info.pointerInfo.pointerFlags = POINTER_FLAG_UP
         self.status = PointerStatus.UP
         self.need_update = False
-        self.auto_update()
+        self._auto_update()
 
     @staticmethod
     def _lerp(a: float, b: float, t: float) -> float:
