@@ -1,6 +1,6 @@
 ## Touch input library
 
-Simple touch input library with multitouch support
+Simple Python touch input package with multitouch support
 
 ### Usage:
 
