@@ -29,7 +29,7 @@ class TouchPointer:
                 self.touch_info.pointerInfo.ptPixelLocation.y)
 
     def _auto_update(self):
-        if self.interface._auto_update:
+        if self.interface.auto_update:
             self.interface._update_all_pointers()
 
     @staticmethod
