@@ -51,7 +51,7 @@ class TouchPointer:
         tifno.pointerInfo.pointerFlags = POINTER_FLAG_NONE
 
     def _set_position(self, pos: (int, int), finger_radius=5):
-        x, y = pos
+        x, y = int(pos[0]), int(pos[1])
         self.touch_info.pointerInfo.ptPixelLocation.x = x
         self.touch_info.pointerInfo.ptPixelLocation.y = y
 
