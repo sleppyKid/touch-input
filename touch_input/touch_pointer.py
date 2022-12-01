@@ -18,6 +18,7 @@ class TouchPointer:
         self.need_update = False
         self.interface = interface
         self.status = PointerStatus.UP
+        self.shake = False
 
     def get_status(self):
         """Get status of current pointer"""
@@ -76,7 +77,7 @@ class TouchPointer:
         self.need_update = True
         self._auto_update()
 
-    def swipe(self, pos: (int, int), finger_radius=5):
+    def swipe(self, pos: (int, int), finger_radius=5, shake=0):
         if self.status in [self.status.PRESSED, self.status.SWIPE]:
             self.touch_info.pointerInfo.pointerFlags = (POINTER_FLAG_INRANGE |
                                                         POINTER_FLAG_INCONTACT |
@@ -86,7 +87,13 @@ class TouchPointer:
                                                         POINTER_FLAG_INRANGE |
                                                         POINTER_FLAG_INCONTACT)
         x, y = pos
-        self._set_position((x, y), finger_radius)
+        if shake:
+            self._set_position((x + (-shake if self.shake else shake),
+                                y + (-shake if self.shake else shake)))
+            self.shake = not self.shake
+        else:
+            self._set_position((x, y), finger_radius)
+
         self.status = PointerStatus.SWIPE
         self.need_update = True
         self._auto_update()
