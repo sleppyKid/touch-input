@@ -28,7 +28,7 @@ time.sleep(.2)
 
 for tick in range(20):
     for x in range(1, touch_nums):
-        touch_interface[x].swipe((300 + tick * 10, 450 + 50*x), shake=1)
+        touch_interface[x].swipe((300 + tick * 10, 450 + 50*x), shake_y=3)
     touch_interface.update()
     time.sleep(0.02)
 

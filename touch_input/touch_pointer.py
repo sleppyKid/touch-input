@@ -77,7 +77,7 @@ class TouchPointer:
         self.need_update = True
         self._auto_update()
 
-    def swipe(self, pos: (int, int), finger_radius=5, shake=0):
+    def swipe(self, pos: (int, int), finger_radius=5, shake_x=0, shake_y=0):
         if self.status in [self.status.PRESSED, self.status.SWIPE]:
             self.touch_info.pointerInfo.pointerFlags = (POINTER_FLAG_INRANGE |
                                                         POINTER_FLAG_INCONTACT |
@@ -87,9 +87,9 @@ class TouchPointer:
                                                         POINTER_FLAG_INRANGE |
                                                         POINTER_FLAG_INCONTACT)
         x, y = pos
-        if shake:
-            self._set_position((x + (-shake if self.shake else shake),
-                                y + (-shake if self.shake else shake)))
+        if shake_x or shake_y:
+            self._set_position((x + (-shake_x if self.shake else shake_x),
+                                y + (-shake_y if self.shake else shake_y)))
             self.shake = not self.shake
         else:
             self._set_position((x, y), finger_radius)
