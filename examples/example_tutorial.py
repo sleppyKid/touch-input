@@ -15,8 +15,8 @@ p2 = tm[1]
 # Do something
 
 # Press 2 pointers
-p1.press_down((500, 500))
-p2.press_down((600, 600))
+p1.press_down((500, 500), rand_offset=5)
+p2.press_down((600, 600), rand_offset=1)
 
 # Holding pointers for more than 0.5 seconds without update may cause errors
 sleep(0.5)
@@ -26,5 +26,5 @@ p1.pull_up()
 p2.pull_up()
 
 # Try some simple actions
-p1.action_swipe((200, 200), (400, 400), 1)
+p1.action_swipe((200, 200), (400, 400), 1, rand_offset=2)
 p2.action_press((300, 400))

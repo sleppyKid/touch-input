@@ -1,7 +1,12 @@
+import random
 from enum import Enum
 from time import sleep
+from typing import TYPE_CHECKING
 
 from .touch_ctypes_constants import *
+
+if TYPE_CHECKING:
+    from .touch_manager import TouchManager
 
 
 class PointerStatus(Enum):
@@ -11,7 +16,7 @@ class PointerStatus(Enum):
 
 
 class TouchPointer:
-    def __init__(self, id, interface):
+    def __init__(self, id, interface: 'TouchManager'):
         self.id = id
         self.touch_info = PointerTouchInfo()
         self.set_pointer_settings(self.id, self.touch_info)
@@ -51,8 +56,12 @@ class TouchPointer:
 
         tifno.pointerInfo.pointerFlags = POINTER_FLAG_NONE
 
-    def _set_position(self, pos: (int, int), finger_radius=5):
+    def _set_position(self, pos: (int, int), finger_radius=5, random_offset=0):
         x, y = int(pos[0]), int(pos[1])
+        if random_offset:
+            x = x + random.randint(-random_offset, random_offset)
+            y = y + random.randint(-random_offset, random_offset)
+
         self.touch_info.pointerInfo.ptPixelLocation.x = x
         self.touch_info.pointerInfo.ptPixelLocation.y = y
 
@@ -61,13 +70,13 @@ class TouchPointer:
         self.touch_info.rcContact.top = y - finger_radius
         self.touch_info.rcContact.bottom = y + finger_radius
 
-    def press_down(self, pos: (int, int), finger_radius=5):
+    def press_down(self, pos: (int, int), finger_radius=5, random_offset=0):
         if self.status in [self.status.PRESSED, self.status.SWIPE]:
             print('pointer already Pressed')
             return
 
         # print('pressed down', self.id, 'pressed down')
-        self._set_position(pos, finger_radius)
+        self._set_position(pos, finger_radius, random_offset)
 
         self.touch_info.pointerInfo.pointerFlags = (POINTER_FLAG_DOWN |
                                                     POINTER_FLAG_INRANGE |
@@ -77,7 +86,7 @@ class TouchPointer:
         self.need_update = True
         self._auto_update()
 
-    def swipe(self, pos: (int, int), finger_radius=5, shake_x=0, shake_y=0):
+    def swipe(self, pos: (int, int), finger_radius=5, random_offset=0, shake_x=0, shake_y=0):
         if self.status in [self.status.PRESSED, self.status.SWIPE]:
             self.touch_info.pointerInfo.pointerFlags = (POINTER_FLAG_INRANGE |
                                                         POINTER_FLAG_INCONTACT |
@@ -89,10 +98,12 @@ class TouchPointer:
         x, y = pos
         if shake_x or shake_y:
             self._set_position((x + (-shake_x if self.shake else shake_x),
-                                y + (-shake_y if self.shake else shake_y)))
+                                y + (-shake_y if self.shake else shake_y)),
+                               finger_radius,
+                               random_offset)
             self.shake = not self.shake
         else:
-            self._set_position((x, y), finger_radius)
+            self._set_position((x, y), finger_radius, random_offset)
 
         self.status = PointerStatus.SWIPE
         self.need_update = True
@@ -115,7 +126,8 @@ class TouchPointer:
     def _lerp2D(self, point1: (int, int), point2: (int, int), t: float):
         return self._lerp(point1[0], point2[0], t), self._lerp(point1[1], point2[1], t)
 
-    def action_swipe(self, start: (int, int), finish: (int, int), duration=1, tick=60):
+    def action_swipe(self, start: (int, int), finish: (int, int), duration=1, tick=60,
+                     random_offset=0, shake_x=0, shake_y=0):
         """
         Animated swipe action
         """
@@ -125,19 +137,20 @@ class TouchPointer:
             t = x / steps
             point = self._lerp2D(start, finish, t)
             x, y = int(point[0]), int(point[1])
-            self.swipe((x, y))
+            self.swipe((x, y), random_offset=random_offset,
+                       shake_x=shake_x, shake_y=shake_y)
             self.interface._update_all_pointers()
             sleep(wait)
         self.pull_up()
         self.interface._update_all_pointers()
 
-    def action_press(self, point: (int, int), hold_time: float = 0.5):
+    def action_press(self, point: (int, int), hold_time: float = 0.5, random_offset=0):
         """
         Simple touch press
         hold_time > 0.5 may cause errors
         """
         hold_time = min(hold_time, 0.5)
-        self.press_down(point)
+        self.press_down(point, random_offset=random_offset)
         self.interface._update_all_pointers()
         sleep(hold_time)
         self.pull_up()
